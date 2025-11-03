@@ -1,44 +1,27 @@
-package com.userservice.entity;
+package com.userservice.dto;
 
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-@Entity
-@Table(name = "users")
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+public class UserDto {
+
     private Long id;
-    @Column(name = "name", nullable = false)
     private String name;
-    @Column(name = "email", nullable = false, unique = true)
     private String email;
-    @Column(name = "age")
     private Integer age;
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @JsonFormat(pattern = "yyyy.MM.dd HH.mm.ss")
     private LocalDateTime createdAt;
 
-    public User() {
+    public UserDto() {
     }
 
-    public User(String name, String email, Integer age) {
-        this.name = name;
-        this.email = email;
-        this.age = age;
-    }
-
-    public User(Long id, String name, String email, Integer age, LocalDateTime createdAt) {
+    public UserDto(Long id, String name, String email, Integer age) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.age = age;
-        this.createdAt = createdAt;
-    }
-
-    @PrePersist
-    protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
 
@@ -86,17 +69,23 @@ public class User {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(email, user.email);
+        UserDto userDto = (UserDto) o;
+        return Objects.equals(id, userDto.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, email);
+        return Objects.hash(id);
     }
 
     @Override
     public String toString() {
-        return "User{id=" + id + ", name='" + name + '\'' + ", email='" + email + '\'' + ", age=" + age + ", createdAt=" + createdAt + '}';
+        return "UserDto{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", age=" + age +
+                ", createdAt=" + createdAt +
+                '}';
     }
 }
