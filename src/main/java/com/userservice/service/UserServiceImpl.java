@@ -6,10 +6,13 @@ import com.userservice.dto.UserUpdateDto;
 import com.userservice.entity.User;
 import com.userservice.exception.UserAlreadyExistsException;
 import com.userservice.exception.UserNotFoundException;
+import com.userservice.kafka.UserEvent;
+import com.userservice.kafka.UserEventProducer;
 import com.userservice.mapper.UserMapper;
 import com.userservice.repository.UserRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,14 +24,17 @@ import java.util.stream.Collectors;
 @Transactional
 public class UserServiceImpl implements UserService {
 
+    public final UserEventProducer eventProducer;
+
     private static final Logger log = LogManager.getLogger(UserServiceImpl.class);
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
+    @Autowired
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, UserEventProducer userEventProducer) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.eventProducer = userEventProducer;
     }
 
     @Override
@@ -43,6 +49,15 @@ public class UserServiceImpl implements UserService {
 
         User user = userMapper.toEntity(createDto);
         User savedUser = userRepository.save(user);
+
+        UserEvent event = new UserEvent(
+                "USER_CREATED",
+                savedUser.getId(),
+                savedUser.getEmail(),
+                savedUser.getName(),
+                savedUser.getAge()
+        );
+        eventProducer.sendUserCreatedEvent(event);
 
         log.info("User created successfully with ID: {}", savedUser.getId());
         return userMapper.toDto(savedUser);
@@ -98,11 +113,19 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(Long id) {
         log.info("Deleting user with ID: {}", id);
 
-        if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException(id);
-        }
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+
+        UserEvent event = new UserEvent(
+                "USER_DELETED",
+                user.getId(),
+                user.getEmail(),
+                user.getName(),
+                user.getAge()
+        );
 
         userRepository.deleteById(id);
+        eventProducer.sendUserDeletedEvent(event);
         log.info("User deleted successfully: {}", id);
     }
 
