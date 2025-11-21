@@ -63,6 +63,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.toDto(savedUser);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public UserDto getUserById(Long id) {
         log.info("Fetching user with ID: {}", id);
@@ -73,6 +74,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.toDto(user);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<UserDto> getAllUsers() {
         log.info("Fetching all users");
@@ -84,6 +86,8 @@ public class UserServiceImpl implements UserService {
                 .map(userMapper::toDto)
                 .collect(Collectors.toList());
     }
+
+
 
     @Override
     @Transactional

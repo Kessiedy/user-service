@@ -1,16 +1,21 @@
 package com.userservice.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 
+@Schema(description = "Данные для обновления пользователя (все поля опциональны)")
 public class UserUpdateDto {
 
+    @Schema(description = "Имя пользователя", example = "Иван Иванов", required = false)
     @Size(min = 2, max = 30, message = "Имя должно содержать от 2 до 30 символов")
     private String name;
 
+    @Schema(description = "Email пользователя", example = "user@example.com", required = false)
     @Email(message = "Некорректный формат Email")
     @Size(min = 5, max = 50, message = "Email должен содержать от 5 до 30 символов")
     private String email;
 
+    @Schema(description = "Возраст пользователя", example = "25", required = false)
     @Min(value = 0, message = "Возраст не может быть отрицательным")
     @Max(value = 110, message = "Возраст не может быть больше 110")
     private Integer age;

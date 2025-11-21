@@ -52,7 +52,6 @@ class UserEventProducerTest {
 
     @BeforeEach
     void setUp() {
-        // Настройка Consumer для прослушивания событий
         Map<String, Object> consumerProps = new HashMap<>();
         consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9094");
         consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, "test-group");

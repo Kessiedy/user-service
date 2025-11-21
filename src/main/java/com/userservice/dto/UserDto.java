@@ -1,16 +1,22 @@
 package com.userservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class UserDto {
 
+    @Schema(description = "Уникальный идентификатор пользователя", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
+    @Schema(description = "имя пользователя", example = "Иван Иванов", required = true)
     private String name;
+    @Schema(description = "Почта пользователя", example = "user@example.com", required = true)
     private String email;
+    @Schema(description = "Возраст пользователя", example = "25", required = true)
     private Integer age;
+    @Schema(description = "Дата создания пользователя", example = "20.11.2025 18.13.24", accessMode = Schema.AccessMode.READ_ONLY)
     @JsonFormat(pattern = "yyyy.MM.dd HH.mm.ss")
     private LocalDateTime createdAt;
 
